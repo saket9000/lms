@@ -1,0 +1,50 @@
+{% extends 'user_base.html' %}
+{% block content %}
+
+    <div class="container body">
+      <div class="main_container">
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          </div>
+        </div>
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Topic {{ topic.name }}</h3>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>{{ topic.description }} </h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+
+                      <div class="form-group">
+                          <iframe src="https://www.youtube.com/embed/{{ topic.video }}" width="550px" height="376px"></iframe>
+                        {# </div> #}
+                      </div>
+
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          <br><br>
+                        </div>
+                      </div>
+                      
+
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary" type="button" onclick="location.href='{% url 'user-topics' %}'">Back</button>
+            </div>
+        </div>
+      </div>
+
+{% endblock %}

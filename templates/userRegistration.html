@@ -1,0 +1,42 @@
+<!doctype html>
+<html> 
+	<head>
+		<title>Learing Management System | Register</title>
+		<link rel="stylesheet" href="/static/scss/login.css"/>
+	</head>
+
+	<body> 
+		<div class="section">
+			<h1><span>REGISTER</span></h1>
+			<form action="{% url 'user_registration' %}" method="post">
+			{% csrf_token %}
+				<ul>
+					<li>
+						<input placeholder="Username" type="text" name="name"/>
+					</li>
+
+					<li>
+						<input placeholder="Phone" type="text" name="mobile"/>
+					</li>
+
+					<li>
+						<input placeholder="Email" type="text" name="email"/>
+					</li>
+				
+					<li>
+						<input placeholder="Password" type="password" name="password"/>
+					</li>
+					
+					<li><input type="submit" class="submit" value="Register" /></li>
+
+					<h3>{{ message }}</h3>
+				</ul>
+			</form>
+			<div style="margin-left: 45px">
+				<input type="submit" class="submit" onclick="location.href='{% url 'login' %}'" value="Login">
+			</div>
+		</div>
+	
+	
+	</body>
+</html>

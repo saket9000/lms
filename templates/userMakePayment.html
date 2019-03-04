@@ -1,0 +1,58 @@
+{% extends 'user_base.html' %}
+{% block content %}
+
+    <div class="container body">
+      <div class="main_container">
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          </div>
+        </div>
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>MAKE PAYMENT</h3>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2> Details </h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="{% url 'user-make-payment' %}" method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" >User ID <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="user_id" required="required" class="form-control col-md-7 col-xs-12" value="{{ user.id }}" disabled>
+                        </div>
+                      </div>
+
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          {% if not user_payment %}
+                          <button class="btn btn-primary" type="button" onclick="location.href='{% url 'home' %}'">Cancel</button>
+                          <button type="submit" class="btn btn-success">Submit</button>
+                          {% endif %}
+                          <br>{{message}}
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container body">
+      <div class="main_container">
+
+        <!-- page content -->
+            <div class="page-title">
+              <div class="title_left">
+                <h3>EDIT PAYMENT DETAILS</h3>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Enter Payment Details of User</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="{% url 'edit-payment' payment_id=payment.id %}" method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">User ID<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input class="form-control col-md-7 col-xs-12" type="text" required="required" name="curradd" value="{{ payment.user.id }}" readonly>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">User Name<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input class="form-control col-md-7 col-xs-12" type="text" required="required" name="curradd" value="{{ payment.user.name }}" readonly>
+                        </div>
+                      </div>
+
+                      {% if payment.payment_done == True %}
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Payment Status</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                          <div class="">
+                            <label>
+                              <input class="checkbox" type="checkbox" class="js-switch" id="payment_status" name="payment_status" checked>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                        {% else %}
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Payment Status</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                          <div class="">
+                            <label>
+                              <input class="checkbox" type="checkbox" class="js-switch" id="payment_status" name="payment_status">
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      {% endif %}
+
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          <button class="btn btn-primary" type="button" onclick="location.href='{% url 'view-courses' %}'">Cancel</button>
+                          <button type="submit" class="btn btn-success">Submit</button>
+                          <br><br>{{ message }}
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+ 
+
+{% endblock %}

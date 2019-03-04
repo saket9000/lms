@@ -1,0 +1,30 @@
+{% extends 'user_base.html' %}
+{% block content %}
+            <div class="page-title">
+              <div class="title_left">
+                <h1>User Details</h1>
+                <br>
+                <font size="4em">
+                ID : {{ id }}
+                <br><br>
+                NAME : {{ name }}
+                <br><br>
+                DOB : {{ dob }}
+                <br>
+                <br>
+                PHONE : {{ mobile }}
+                <br><br>
+                ADDRESS : {{ address }}
+                <br>
+                <br>
+                {% for value in gender %}
+                GENDER : {{ value.1 }}
+                {% endfor %}
+                <br>
+                </font>
+              </div> 
+              {% if photo %}
+              <img src="{{photo}}" width=180 height=200 hspace="30" align="right" style=" border:2px solid black; margin-top: 40px; margin-right: 50px; ">
+                {% endif %}
+            </div>     
+{% endblock %}
