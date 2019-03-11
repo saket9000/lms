@@ -49,7 +49,7 @@ def user_registration(request):
 		mobile = request.POST.get('mobile')
 		email = request.POST.get('email')
 		password = request.POST.get('password')
-		user = models.UserProfile.objects.filter(mobile=mobile).last()
+		user = models.UserProfile.objects.filter(mobile=mobile, soft_delete=False).last()
 		if user:
 			context_dict.update({'message': 'User already exists with this mobile number'})
 			return render(request, "userRegistration.html", context_dict)
@@ -111,7 +111,7 @@ def add_course(request):
 		duration = request.POST.get('duration')
 		if int(duration) > 0:
 			course = models.Course.objects.filter(
-				name=cname, abbr=abb
+				name=cname, abbr=abb, soft_delete=False
 			).last()
 			if course:
 				course.duration = duration
@@ -126,7 +126,7 @@ def add_course(request):
 
 @login_required
 def add_subject(request):
-	courses = models.Course.objects.all()
+	courses = models.Course.objects.filter(soft_delete=False)
 	context_dict = {
 		"all_courses": courses,
 	}
@@ -139,7 +139,7 @@ def add_subject(request):
 		info = request.POST.get('information')
 
 		subject = models.Subject.objects.filter(
-			name=name, course_id=course
+			name=name, course_id=course, soft_delete=False
 		).last()
 		if subject:
 			subject.information = info
@@ -168,7 +168,7 @@ def add_topic(request):
 		desc = request.POST.get('desc')
 
 		topic = models.Topic.objects.filter(
-			subject_id=subject, name=name
+			subject_id=subject, name=name, soft_delete=False
 		).last()
 		if topic:
 			topic.video = video
@@ -197,7 +197,7 @@ def add_payment_details(request):
 			return render(request, "addPaymentStatus.html", context_dict)
 		payment_status = request.POST.get('payment_status') #checkbox
 		payment_status = True if payment_status == 'on' else False
-		payment_details = models.PaymentDetails.objects.filter(user=user).last()
+		payment_details = models.PaymentDetails.objects.filter(user=user, soft_delete=False).last()
 		if payment_details:
 			payment_details.payment_done = payment_status
 			payment_details.save()
@@ -208,6 +208,44 @@ def add_payment_details(request):
 		context_dict.update({'message': 'Data saved successfully'})
 		return render(request, "addPaymentStatus.html", context_dict)
 	return render(request, "addPaymentStatus.html", context_dict)
+
+@login_required
+def add_attendance(request):
+	context_dict = {}
+	emp = models.UserProfile.objects.filter(username=request.user).first()
+	#CAN ADD COURSE AJAX FILTER
+	users = models.UserProfile.objects.filter(soft_delete=False)
+	subjects = models.Subject.objects.filter(soft_delete=False)
+	if not emp.is_employee:
+		raise Http404
+	if request.method == 'POST':
+		user = models.UserProfile.objects.get(id=request.POST.get('user_id'))
+		subject = models.Subject.objects.get(id=request.POST.get('subject_id'))
+		total_attendance = request.POST.get('total_attendance')
+		attendance_obtained = request.POST.get('attendance_obtained')
+		user_attendance = models.Attendance.objects.filter(
+			user=user, subject=subject
+		).last()
+		if user_attendance and int(total_attendance) > 0 and int(attendance_obtained) > 0:
+			user_attendance.total_attendance = total_attendance
+			user_attendance.obtained_attendance = attendance_obtained
+			user_attendance.save()
+			context_dict.update({'message': 'Data saved successfully.'})
+		elif not user_attendance and int(total_attendance) > 0 and int(attendance_obtained) > 0:
+			models.Attendance.objects.create(
+				user=user, subject=subject,
+				total_attendance=total_attendance,
+				obtained_attendance=attendance_obtained
+			)
+			context_dict.update({'message': 'Data saved successfully.'})
+		else:
+			context_dict.update({'message': 'Enter Correct attendance data.'})
+		return render(request, "addAttendance.html", context_dict)
+	context_dict.update({
+		'users': users,
+		'subjects': subjects,
+	})
+	return render(request, "addAttendance.html", context_dict)
 
 @login_required
 def view_courses(request):
@@ -266,6 +304,20 @@ def view_payments(request):
 	)
 
 @login_required
+def view_attendance(request):
+	emp = models.UserProfile.objects.filter(username=request.user).first()
+	if not emp.is_employee:
+		raise Http404
+	context_dict = {
+		'title': 'All Attendance Records'
+	}
+	return render(
+		request,
+		'viewAttendance.html',
+		context_dict
+	)
+
+@login_required
 def delete_course(request, course_id):
 
 	emp = models.UserProfile.objects.filter(username=request.user).first()
@@ -277,7 +329,7 @@ def delete_course(request, course_id):
 	if not course:
 		raise Http404
 	course.soft_delete = True
-	subjects = models.Subject.objects.filter(course=course)
+	subjects = models.Subject.objects.filter(course=course, soft_delete=False)
 	topics = models.Topic.objects.filter(subject__in=subjects)
 	subjects.update(soft_delete=True)
 	topics.update(soft_delete=True)
@@ -296,7 +348,7 @@ def delete_subject(request, subject_id):
 	if not subject:
 		raise Http404
 	subject.soft_delete = True
-	models.Topic.objects.filter(subject=subject).update(soft_delete=True)
+	models.Topic.objects.filter(subject=subject, soft_delete=False).update(soft_delete=True)
 	subject.save()
 	return HttpResponseRedirect(reverse('view-subjects'))
 
@@ -314,6 +366,21 @@ def delete_topic(request, topic_id):
 	topic.soft_delete = True
 	topic.save()
 	return HttpResponseRedirect(reverse('view-topics'))
+
+@login_required
+def delete_attendance(request, attendance_id):
+
+	emp = models.UserProfile.objects.filter(username=request.user).first()
+	if not emp.is_employee:
+		raise Http404
+	attendance = models.Attendance.objects.filter(
+		pk=topic_id, soft_delete=False
+	).first()
+	if not attendance:
+		raise Http404
+	attendance.soft_delete = True
+	attendance.save()
+	return HttpResponseRedirect(reverse('view-attendance'))
 
 @login_required
 def edit_course(request, course_id):
@@ -363,7 +430,7 @@ def edit_subject(request, subject_id):
 	).first()
 	if not subject:
 		raise Http404
-	courses = models.Course.objects.all()
+	courses = models.Course.objects.filter(soft_delete=False)
 	context_dict = {
 		'subject': subject,
 		'course_helper': courses,
@@ -402,7 +469,7 @@ def edit_topic(request, topic_id):
 	).first()
 	if not topic:
 		raise Http404
-	subjects = models.Subject.objects.all()
+	subjects = models.Subject.objects.filter(soft_delete=False)
 	context_dict = {
 		'topic': topic,
 		'subject_helper': subjects,
@@ -470,14 +537,48 @@ def edit_payment_details(request, payment_id):
 	)
 
 @login_required
+def edit_attendance(request, attendance_id):
+	emp = models.UserProfile.objects.filter(username=request.user).first()
+	if not emp.is_employee:
+		raise Http404
+	attendance = models.Attendance.objects.filter(
+		pk=attendance_id, soft_delete=False
+	).first()
+	if not attendance:
+		raise Http404
+	context_dict = {
+		'attendance': attendance,
+	}
+	if request.method == 'POST':
+		total_attendance = request.POST.get('total_attendance')
+		attendance_obtained = request.POST.get('attendance_obtained')
+		try:
+			if attendance.total_attendance != total_attendance:
+				attendance.total_attendance = total_attendance
+			if attendance.obtained_attendance != attendance_obtained:
+				attendance.obtained_attendance = attendance_obtained
+			attendance.save()
+			context_dict["message"] = 'Successfully updated attendance.'
+			context_dict["success"] = True
+		except Exception as e:
+			context_dict["message"] = str(e)
+			context_dict["success"] = False
+			print(e)
+	if context_dict.get('success', False):
+		return HttpResponseRedirect(reverse('view-attendance'))
+	return render(
+		request, "editAttendance.html", context_dict
+	)
+
+@login_required
 def add_user_course(request):
 	
 	user = models.UserProfile.objects.filter(username=request.user).first()
 	if not user.is_student:
 		raise Http404
-	courses = models.Course.objects.all()
+	courses = models.Course.objects.filter(soft_delete=False)
 	user_course = models.UserCourse.objects.filter(
-		user=user
+		user=user, soft_delete=False
 	).last()
 	context_dict = {
 		'courses': courses,
@@ -489,7 +590,7 @@ def add_user_course(request):
 	if request.method == 'POST':
 		course_id = request.POST.get('course_picker')
 		user_course = models.UserCourse.objects.filter(
-			user=user
+			user=user, soft_delete=False
 		).last()
 		if not user_course:
 			user_course = models.UserCourse.objects.create(
@@ -530,7 +631,7 @@ def topic_page(request, topic_id):
 	user = models.UserProfile.objects.filter(username=request.user).first()
 	if not user.is_student:
 		raise Http404
-	topic = models.Topic.objects.filter(id=topic_id).last()
+	topic = models.Topic.objects.filter(id=topic_id, soft_delete=False).last()
 	context_dict = {'topic': topic}
 	return render(request, "topic.html", context_dict)
 

@@ -27,6 +27,8 @@
 
     <!-- Custom Theme Style -->
     <link href="/static/scss/custom.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
 
 
   </head>
@@ -82,6 +84,13 @@
                     <ul class="nav child_menu">
                       <li><a href="{% url 'add_payment' %}">Approve Payment</a></li>
                       <li><a href="{% url 'view-payments' %}">View Payment Records</a></li>
+                    </ul>
+                  </li>
+
+                  <li><a><i class="fa fa-bar-chart-o"></i> Attendance  <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{% url 'add-attendance' %}">Add Attendance</a></li>
+                      <li><a href="{% url 'view-attendance' %}">View Attendance</a></li>
                     </ul>
                   </li>
 
@@ -199,11 +208,12 @@
     <!-- Custom Theme Scripts -->
 
     <script>
-        $('.select2').select2();
-
         $('#myDatepicker2').datetimepicker({
             format: 'YYYY-MM-DD'
         });
+    </script>
+    <script type="text/javascript">
+      $('#mySelect2').select2();
     </script>
 
   </body>

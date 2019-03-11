@@ -90,3 +90,19 @@ class PaymentDetails(TimeStampModel):
 
 	def __unicode__(self):
 		return unicode(str(userprofile) + '-' + str(self.payment_done))
+
+
+class Attendance(TimeStampModel):
+	user = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+	subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
+	total_attendance = models.IntegerField()
+	obtained_attendance = models.IntegerField()
+
+	def __str__(self):
+		return str(str(self.user) + '-' + str(self.subject) + '-' + str(self.obtained_attendance))
+
+	def __unicode__(self):
+		return unicode(str(self.user) + '-' + str(self.subject) + '-' + str(self.obtained_attendance))
+
+	class Meta:
+		unique_together = ["user", "subject"]
